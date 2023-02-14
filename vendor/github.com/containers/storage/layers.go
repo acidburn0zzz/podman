@@ -117,6 +117,11 @@ type Layer struct {
 
 	// ReadOnly is true if this layer resides in a read-only layer store.
 	ReadOnly bool `json:"-"`
+
+	// BigDataNames is a list of names of data items that we keep for the
+	// convenience of the caller.  They can be large, and are only in
+	// memory when being read from or written to disk.
+	BigDataNames []string `json:"big-data-names,omitempty"`
 }
 
 type layerMountPoint struct {
@@ -137,6 +142,7 @@ type DiffOptions struct {
 type ROLayerStore interface {
 	ROFileBasedStore
 	ROMetadataStore
+	ROLayerBigDataStore
 
 	// Exists checks if a layer with the specified name or ID is known.
 	Exists(id string) bool
@@ -194,6 +200,7 @@ type LayerStore interface {
 	RWFileBasedStore
 	RWMetadataStore
 	FlaggableStore
+	RWLayerBigDataStore
 
 	// Create creates a new layer, optionally giving it a specified ID rather than
 	// a randomly-generated one, either inheriting data from another specified
@@ -278,6 +285,7 @@ func copyLayer(l *Layer) *Layer {
 		UncompressedSize:   l.UncompressedSize,
 		CompressionType:    l.CompressionType,
 		ReadOnly:           l.ReadOnly,
+		BigDataNames:       copyStringSlice(l.BigDataNames),
 		Flags:              copyStringInterfaceMap(l.Flags),
 		UIDMap:             copyIDMap(l.UIDMap),
 		GIDMap:             copyIDMap(l.GIDMap),
@@ -694,14 +702,15 @@ func (r *layerStore) Put(id string, parentLayer *Layer, names []string, mountLab
 	}
 	if err == nil {
 		layer = &Layer{
-			ID:         id,
-			Parent:     parent,
-			Names:      names,
-			MountLabel: mountLabel,
-			Created:    time.Now().UTC(),
-			Flags:      make(map[string]interface{}),
-			UIDMap:     copyIDMap(moreOptions.UIDMap),
-			GIDMap:     copyIDMap(moreOptions.GIDMap),
+			ID:           id,
+			Parent:       parent,
+			Names:        names,
+			MountLabel:   mountLabel,
+			Created:      time.Now().UTC(),
+			Flags:        make(map[string]interface{}),
+			UIDMap:       copyIDMap(moreOptions.UIDMap),
+			GIDMap:       copyIDMap(moreOptions.GIDMap),
+			BigDataNames: []string{},
 		}
 		r.layers = append(r.layers, layer)
 		r.idindex.Add(id)
@@ -907,11 +916,11 @@ func (r *layerStore) ParentOwners(id string) (uids, gids []int, err error) {
 	for dir := filepath.Dir(layer.MountPoint); dir != "" && dir != string(os.PathSeparator); dir = filepath.Dir(dir) {
 		st, err := system.Stat(dir)
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "error reading ownership of directory %q", dir)
+			return nil, nil, errors.Wrap(err, "read directory ownership")
 		}
 		lst, err := system.Lstat(dir)
 		if err != nil {
-			return nil, nil, errors.Wrapf(err, "error reading ownership of directory-in-case-it's-a-symlink %q", dir)
+			return nil, nil, err
 		}
 		fsuid := int(st.UID())
 		fsgid := int(st.GID())
@@ -970,6 +979,80 @@ func (r *layerStore) SetNames(id string, names []string) error {
 	return ErrLayerUnknown
 }
 
+func (r *layerStore) datadir(id string) string {
+	return filepath.Join(r.layerdir, id)
+}
+
+func (r *layerStore) datapath(id, key string) string {
+	return filepath.Join(r.datadir(id), makeBigDataBaseName(key))
+}
+
+func (r *layerStore) BigData(id, key string) (io.ReadCloser, error) {
+	if key == "" {
+		return nil, errors.Wrapf(ErrInvalidBigDataName, "can't retrieve layer big data value for empty name")
+	}
+	layer, ok := r.lookup(id)
+	if !ok {
+		return nil, errors.Wrapf(ErrLayerUnknown, "error locating layer with ID %q", id)
+	}
+	return os.Open(r.datapath(layer.ID, key))
+}
+
+func (r *layerStore) SetBigData(id, key string, data io.Reader) error {
+	if key == "" {
+		return errors.Wrapf(ErrInvalidBigDataName, "can't set empty name for layer big data item")
+	}
+	if !r.IsReadWrite() {
+		return errors.Wrapf(ErrStoreIsReadOnly, "not allowed to save data items associated with layers at %q", r.layerspath())
+	}
+	layer, ok := r.lookup(id)
+	if !ok {
+		return errors.Wrapf(ErrLayerUnknown, "error locating layer with ID %q to write bigdata", id)
+	}
+	err := os.MkdirAll(r.datadir(layer.ID), 0700)
+	if err != nil {
+		return err
+	}
+
+	// NewAtomicFileWriter doesn't overwrite/truncate the existing inode.
+	// BigData() relies on this behaviour when opening the file for read
+	// so that it is either accessing the old data or the new one.
+	writer, err := ioutils.NewAtomicFileWriter(r.datapath(layer.ID, key), 0600)
+	if err != nil {
+		return errors.Wrapf(err, "error opening bigdata file")
+	}
+
+	if _, err := io.Copy(writer, data); err != nil {
+		writer.Close()
+		return errors.Wrapf(err, "error copying bigdata for the layer")
+
+	}
+	if err := writer.Close(); err != nil {
+		return errors.Wrapf(err, "error closing bigdata file for the layer")
+	}
+
+	addName := true
+	for _, name := range layer.BigDataNames {
+		if name == key {
+			addName = false
+			break
+		}
+	}
+	if addName {
+		layer.BigDataNames = append(layer.BigDataNames, key)
+		return r.Save()
+	}
+	return nil
+}
+
+func (r *layerStore) BigDataNames(id string) ([]string, error) {
+	layer, ok := r.lookup(id)
+	if !ok {
+		return nil, errors.Wrapf(ErrImageUnknown, "error locating layer with ID %q to retrieve bigdata names", id)
+	}
+	return copyStringSlice(layer.BigDataNames), nil
+}
+
 func (r *layerStore) Metadata(id string) (string, error) {
 	if layer, ok := r.lookup(id); ok {
 		return layer.Metadata, nil
@@ -1004,6 +1087,7 @@ func (r *layerStore) deleteInternal(id string) error {
 	err := r.driver.Remove(id)
 	if err == nil {
 		os.Remove(r.tspath(id))
+		os.RemoveAll(r.datadir(id))
 		delete(r.byid, id)
 		for _, name := range layer.Names {
 			delete(r.byname, name)
@@ -1329,6 +1413,7 @@ func (r *layerStore) ApplyDiff(to string, diff io.Reader) (size int64, err error
 	if err != nil {
 		return -1, err
 	}
+	defer uncompressed.Close()
 	uncompressedDigest := digest.Canonical.Digester()
 	uncompressedCounter := ioutils.NewWriteCounter(uncompressedDigest.Hash())
 	uidLog := make(map[uint32]struct{})
@@ -1342,6 +1427,7 @@ func (r *layerStore) ApplyDiff(to string, diff io.Reader) (size int64, err error
 	if err != nil {
 		return -1, err
 	}
+	defer idLogger.Close()
 	payload, err := asm.NewInputTarStream(io.TeeReader(uncompressed, io.MultiWriter(uncompressedCounter, idLogger)), metadata, storage.NewDiscardFilePutter())
 	if err != nil {
 		return -1, err
@@ -1356,7 +1442,6 @@ func (r *layerStore) ApplyDiff(to string, diff io.Reader) (size int64, err error
 		return -1, err
 	}
 	compressor.Close()
-	idLogger.Close()
 	if err == nil {
 		if err := os.MkdirAll(filepath.Dir(r.tspath(layer.ID)), 0700); err != nil {
 			return -1, err
