@@ -88,7 +88,6 @@ github.com/containers/ocicrypt v1.0.3/go.mod h1:CUBa+8MRNL/VkpxYIpaMtgn1WgXGyvPQ
 github.com/containers/psgo v1.5.1 h1:MQNb7FLbXqBdqz6u4lI2QWizVz4RSTzs1+Nk9XT1iVA=
 github.com/containers/psgo v1.5.1/go.mod h1:2ubh0SsreMZjSXW1Hif58JrEcFudQyIy9EzPUWfawVU=
 github.com/containers/storage v1.20.2/go.mod h1:oOB9Ie8OVPojvoaKWEGSEtHbXUAs+tSyr7RO7ZGteMc=
-github.com/containers/storage v1.23.0 h1:gYyNkBiihC2FvGiHOjOjpnfojYwgxpLVooTUlmD6pxs=
 github.com/containers/storage v1.23.0/go.mod h1:I1EIAA7B4OwWRSA0b4yq2AW1wjvvfcY0zLWQuwTa4zw=
 github.com/containers/storage v1.23.2 h1:GPZ8PXYezML1gmZ/uFaXQpyps7AH645lmdvvOJwJYNc=
 github.com/containers/storage v1.23.2/go.mod h1:AyTMMiE5ANvZJiqvatQgSZ85wAl5yHucY3NDN/kemr4=
@@ -259,7 +258,6 @@ github.com/kisielk/errcheck v1.2.0/go.mod h1:/BMXB+zMLi60iA8Vv6Ksmxu/1UDYcXs4uQL
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/klauspost/compress v1.10.7/go.mod h1:aoV0uJVorq1K+umq18yTdKaF57EivdYsUV+/s2qKfXs=
 github.com/klauspost/compress v1.10.8/go.mod h1:aoV0uJVorq1K+umq18yTdKaF57EivdYsUV+/s2qKfXs=
-github.com/klauspost/compress v1.10.10 h1:a/y8CglcM7gLGYmlbP/stPE5sR3hbhFRUjCBfd/0B3I=
 github.com/klauspost/compress v1.10.10/go.mod h1:aoV0uJVorq1K+umq18yTdKaF57EivdYsUV+/s2qKfXs=
 github.com/klauspost/compress v1.10.11 h1:K9z59aO18Aywg2b/WSgBaUX99mHy2BES18Cr5lBKZHk=
 github.com/klauspost/compress v1.10.11/go.mod h1:aoV0uJVorq1K+umq18yTdKaF57EivdYsUV+/s2qKfXs=
@@ -402,7 +400,6 @@ github.com/safchain/ethtool v0.0.0-20190326074333-42ed695e3de8 h1:2c1EFnZHIPCW8q
 github.com/safchain/ethtool v0.0.0-20190326074333-42ed695e3de8/go.mod h1:Z0q5wiBQGYcxhMZ6gUqHn6pYNLypFAvaL3UvgZLR0U4=
 github.com/seccomp/containers-golang v0.6.0 h1:VWPMMIDr8pAtNjCX0WvLEEK9EQi5lAm4HtJbDtAtFvQ=
 github.com/seccomp/containers-golang v0.6.0/go.mod h1:Dd9mONHvW4YdbSzdm23yf2CFw0iqvqLhO0mEFvPIvm4=
-github.com/seccomp/libseccomp-golang v0.9.1 h1:NJjM5DNFOs0s3kYE1WUOr6G8V97sdt46rlXTMfXGWBo=
 github.com/seccomp/libseccomp-golang v0.9.1/go.mod h1:GbW5+tmTXfcxTToHLXlScSlAvWlF4P2Ca7zGrPiEpWo=
 github.com/seccomp/libseccomp-golang v0.9.2-0.20200616122406-847368b35ebf h1:b0+ZBD3rohnkQ4q5duD1+RyTXTg9yk+qTOPMSQtapO0=
 github.com/seccomp/libseccomp-golang v0.9.2-0.20200616122406-847368b35ebf/go.mod h1:JA8cRccbGaA1s33RQf7Y1+q9gHmZX1yB/z9WDN1C6fg=
@@ -566,8 +563,9 @@ golang.org/x/sys v0.0.0-20200327173247-9dae0f8f5775/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20200501145240-bc7a7d42d5c3/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200519105757-fe76b779f299/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200720211630-cb9d2d5c5666/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20200728102440-3e129f6d46b1 h1:sIky/MyNRSHTrdxfsiUSS4WIAMvInbeXljJz+jDjeYE=
 golang.org/x/sys v0.0.0-20200728102440-3e129f6d46b1/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.1.0 h1:kunALQeHf1/185U1i0GOB/fy1IPRDDpuoOOqRReG57U=
+golang.org/x/sys v0.1.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
 golang.org/x/text v0.0.0-20160726164857-2910a502d2bf/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.1-0.20181227161524-e6919f6577db/go.mod h1:bEr9sfX3Q8Zfm5fL9x+3itogRgK3+ptLWKqgva+5dAk=
