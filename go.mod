@@ -20,7 +20,7 @@ require (
 	github.com/cri-o/ocicni v0.2.0
 	github.com/cyphar/filepath-securejoin v0.2.2
 	github.com/davecgh/go-spew v1.1.1
-	github.com/docker/distribution v2.7.1+incompatible
+	github.com/docker/distribution v2.8.2+incompatible
 	github.com/docker/docker v1.4.2-0.20191219165747-a9416c67da9f
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-units v0.4.0
