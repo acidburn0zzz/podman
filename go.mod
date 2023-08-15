@@ -21,7 +21,7 @@ require (
 	github.com/cyphar/filepath-securejoin v0.2.2
 	github.com/davecgh/go-spew v1.1.1
 	github.com/docker/distribution v2.7.1+incompatible
-	github.com/docker/docker v1.4.2-0.20191219165747-a9416c67da9f
+	github.com/docker/docker v20.10.24+incompatible
 	github.com/docker/go-connections v0.4.0
 	github.com/docker/go-units v0.4.0
 	github.com/fsnotify/fsnotify v1.4.9
@@ -34,6 +34,8 @@ require (
 	github.com/hashicorp/go-multierror v1.1.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/json-iterator/go v1.1.10
+	github.com/moby/sys/mount v0.3.3 // indirect
+	github.com/moby/term v0.5.0 // indirect
 	github.com/mrunalp/fileutils v0.0.0-20171103030105-7d4729fb3618
 	github.com/onsi/ginkgo v1.14.0
 	github.com/onsi/gomega v1.10.1
@@ -57,10 +59,11 @@ require (
 	github.com/varlink/go v0.0.0-20190502142041-0f1d566d194b
 	github.com/vishvananda/netlink v1.1.0
 	go.etcd.io/bbolt v1.3.5
-	golang.org/x/crypto v0.0.0-20200423211502-4bdfaf469ed5
-	golang.org/x/net v0.0.0-20200520004742-59133d7f0dd7
-	golang.org/x/sync v0.0.0-20200317015054-43a5402ce75a
-	golang.org/x/sys v0.0.0-20200728102440-3e129f6d46b1
+	golang.org/x/crypto v0.1.0
+	golang.org/x/net v0.1.0
+	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4
+	golang.org/x/sys v0.11.0
+	gotest.tools/v3 v3.5.0 // indirect
 	k8s.io/api v0.18.8
 	k8s.io/apimachinery v0.18.8
 	k8s.io/client-go v0.0.0-20190620085101-78d2af792bab

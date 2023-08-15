@@ -130,12 +130,10 @@ func mkdirWithACL(name string, sddl string) error {
 // by the daemon. This SHOULD be treated as absolute from a docker processing
 // perspective.
 func IsAbs(path string) bool {
-	if !filepath.IsAbs(path) {
-		if !strings.HasPrefix(path, string(os.PathSeparator)) {
-			return false
-		}
+	if filepath.IsAbs(path) || strings.HasPrefix(path, string(os.PathSeparator)) {
+		return true
 	}
-	return true
+	return false
 }
 
 // The origin of the functions below here are the golang OS and windows packages,
@@ -260,7 +258,7 @@ func nextSuffix() string {
 	return strconv.Itoa(int(1e9 + r%1e9))[1:]
 }
 
-// TempFileSequential is a copy of ioutil.TempFile, modified to use sequential
+// TempFileSequential is a copy of os.CreateTemp, modified to use sequential
 // file access. Below is the original comment from golang:
 // TempFile creates a new temporary file in the directory dir
 // with a name beginning with prefix, opens the file for reading
